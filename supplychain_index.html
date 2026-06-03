@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Chain Intelligence Platform | Anke Jimrison</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#e2e8f0}
+header{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);padding:28px 40px}
+header h1{font-size:1.7rem;color:#fff}
+header p{color:#93c5fd;margin-top:5px;font-size:0.9rem}
+.badge{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;padding:3px 10px;border-radius:20px;font-size:0.78rem;margin:6px 3px 0}
+.container{max-width:1100px;margin:28px auto;padding:0 18px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:26px}
+.kpi{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:18px;text-align:center}
+.kpi .val{font-size:1.6rem;font-weight:700;color:#60a5fa}
+.kpi .lbl{font-size:0.73rem;color:#94a3b8;margin-top:5px}
+.kpi.red .val{color:#f87171}.kpi.green .val{color:#34d399}
+.kpi.yellow .val{color:#fbbf24}
+.sec{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:22px;margin-bottom:22px}
+.sec h2{font-size:1rem;color:#60a5fa;margin-bottom:14px;border-bottom:1px solid #2d3748;padding-bottom:9px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px}
+.chart-box{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:20px}
+.chart-box h3{font-size:0.9rem;color:#60a5fa;margin-bottom:14px}
+.chart-wrap{position:relative;height:260px}
+@media(max-width:700px){.charts-row{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:0.84rem}
+th{background:#0f1117;color:#94a3b8;padding:9px 11px;text-align:left;font-weight:600}
+td{padding:9px 11px;border-bottom:1px solid #1e293b}
+tr:hover td{background:#0f1117}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:680px){.two{grid-template-columns:1fr}}
+.crit{color:#f87171;font-weight:700}.high{color:#fb923c;font-weight:600}
+.med{color:#fbbf24}.low{color:#34d399}
+.pill{padding:2px 9px;border-radius:10px;font-size:0.73rem;font-weight:600}
+.pill-c{background:#7f1d1d;color:#fca5a5}
+.pill-h{background:#7c2d12;color:#fed7aa}
+.pill-m{background:#78350f;color:#fde68a}
+.pill-l{background:#064e3b;color:#6ee7b7}
+.bar-w{background:#0f1117;border-radius:4px;height:7px;margin-top:3px}
+.bar{height:7px;border-radius:4px}
+.anomaly{background:#7f1d1d;color:#fca5a5;padding:2px 8px;border-radius:10px;font-size:0.73rem}
+.saving{background:#064e3b;color:#6ee7b7;padding:2px 8px;border-radius:10px;font-size:0.73rem}
+footer{text-align:center;padding:28px;color:#475569;font-size:0.82rem}
+footer a{color:#60a5fa;text-decoration:none;margin:0 6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏭 Supply Chain Intelligence Platform</h1>
+  <p>GlobalManufacture Pvt. Ltd. — ₹500Cr+ FMCG Manufacturer · 85 Suppliers · 5,000 POs · 6 Warehouses</p>
+  <span class="badge">Python</span><span class="badge">MySQL</span><span class="badge">Power BI</span>
+  <span class="badge">Z-Score Detection</span><span class="badge">5-Factor Risk Model</span><span class="badge">IQR Method</span>
+</header>
+
+<div class="container">
+<!-- KPIs -->
+<div class="kpi-grid">
+  <div class="kpi red"><div class="val">₹43.3Cr</div><div class="lbl">At Financial Risk (94 POs)</div></div>
+  <div class="kpi green"><div class="val">₹27.75Cr</div><div class="lbl">Savings Opportunity</div></div>
+  <div class="kpi yellow"><div class="val">₹138.9Cr</div><div class="lbl">Dead Stock Blocked</div></div>
+  <div class="kpi red"><div class="val">24</div><div class="lbl">Critical-Risk Suppliers</div></div>
+  <div class="kpi yellow"><div class="val">77.5%</div><div class="lbl">OTD (vs 95% target)</div></div>
+  <div class="kpi yellow"><div class="val">2.31%</div><div class="lbl">Quality Rejection Rate</div></div>
+</div>
+
+<!-- CHARTS ROW 1 -->
+<div class="charts-row">
+  <div class="chart-box">
+    <h3>🔴 Supplier Risk Tier Distribution (85 Suppliers)</h3>
+    <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <h3>💰 Savings by Category (₹ Cr)</h3>
+    <div class="chart-wrap"><canvas id="savingsChart"></canvas></div>
+  </div>
+</div>
+
+<!-- CHARTS ROW 2 -->
+<div class="charts-row">
+  <div class="chart-box">
+    <h3>⚠️ Anomaly Detection — POs Flagged by Method</h3>
+    <div class="chart-wrap"><canvas id="anomChart"></canvas></div>
+  </div>
+  <div class="chart-box">
+    <h3>📦 Dead Stock by Warehouse (₹ Cr)</h3>
+    <div class="chart-wrap"><canvas id="whChart"></canvas></div>
+  </div>
+</div>
+
+<!-- Insights Table -->
+<div class="sec">
+  <h2>📊 Key Business Insights — GlobalManufacture Pvt. Ltd.</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Finding</th><th>Business Impact</th></tr></thead>
+    <tbody>
+      <tr><td>On-Time Delivery</td><td>77.5% vs 95% benchmark</td><td class="crit">17.5pp gap causing stockouts</td></tr>
+      <tr><td>Anomalous POs</td><td>94 orders flagged (Z-score >2.5)</td><td class="crit">₹43.3Cr at financial risk</td></tr>
+      <tr><td>Critical Risk Suppliers</td><td>24 suppliers (28% of base)</td><td class="crit">Immediate action required</td></tr>
+      <tr><td>Procurement Savings</td><td>Median price benchmarking</td><td class="low">₹27.75Cr savings opportunity</td></tr>
+      <tr><td>Dead Stock</td><td>Slow-moving inventory >3 months</td><td class="high">₹138.9Cr working capital blocked</td></tr>
+      <tr><td>Quality Rejection</td><td>2.31% average</td><td class="med">0.81pp above 1.5% target</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Supplier Scorecard -->
+<div class="sec">
+  <h2>🔴 Supplier Risk Scorecard — 5-Factor Composite Model (0–100)</h2>
+  <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:12px">OTD Gap (30pts) + Quality Rejection (25pts) + Price Volatility (20pts) + Single-Source Risk (10pts) + Anomaly Frequency (15pts)<br>Score ≥70 = CRITICAL · 50–69 = HIGH · 30–49 = MEDIUM · &lt;30 = LOW</p>
+  <table>
+    <thead><tr><th>Supplier ID</th><th>Category</th><th>Composite Score</th><th>OTD%</th><th>Rejection%</th><th>Price CV</th><th>Risk Tier</th></tr></thead>
+    <tbody>
+      <tr><td>SUP-014</td><td>Raw Materials</td><td><span class="crit">91</span><div class="bar-w"><div class="bar" style="width:91%;background:linear-gradient(90deg,#dc2626,#f87171)"></div></div></td><td class="crit">61%</td><td class="crit">4.2%</td><td>0.38</td><td><span class="pill pill-c">CRITICAL</span></td></tr>
+      <tr><td>SUP-027</td><td>Packaging</td><td><span class="crit">87</span><div class="bar-w"><div class="bar" style="width:87%;background:linear-gradient(90deg,#dc2626,#f87171)"></div></div></td><td class="crit">65%</td><td class="crit">3.8%</td><td>0.31</td><td><span class="pill pill-c">CRITICAL</span></td></tr>
+      <tr><td>SUP-003</td><td>Chemicals</td><td><span class="crit">83</span><div class="bar-w"><div class="bar" style="width:83%;background:linear-gradient(90deg,#dc2626,#f87171)"></div></div></td><td class="crit">68%</td><td class="crit">5.1%</td><td>0.29</td><td><span class="pill pill-c">CRITICAL</span></td></tr>
+      <tr><td>SUP-051</td><td>Logistics</td><td><span class="high">74</span><div class="bar-w"><div class="bar" style="width:74%;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div></td><td class="high">71%</td><td class="high">2.9%</td><td>0.22</td><td><span class="pill pill-h">HIGH</span></td></tr>
+      <tr><td>SUP-038</td><td>Equipment</td><td><span class="high">71</span><div class="bar-w"><div class="bar" style="width:71%;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div></td><td class="high">73%</td><td class="high">2.6%</td><td>0.19</td><td><span class="pill pill-h">HIGH</span></td></tr>
+      <tr><td>SUP-062</td><td>Raw Materials</td><td><span class="med">58</span><div class="bar-w"><div class="bar" style="width:58%;background:linear-gradient(90deg,#1d4ed8,#60a5fa)"></div></div></td><td class="med">78%</td><td class="med">1.9%</td><td>0.14</td><td><span class="pill pill-m">MEDIUM</span></td></tr>
+      <tr><td>SUP-071</td><td>Packaging</td><td><span class="low">31</span><div class="bar-w"><div class="bar" style="width:31%;background:linear-gradient(90deg,#065f46,#34d399)"></div></div></td><td class="low">93%</td><td class="low">0.8%</td><td>0.06</td><td><span class="pill pill-l">LOW</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="two">
+<!-- Anomaly Detection -->
+<div class="sec">
+  <h2>⚠️ Statistical Anomaly Detection Results</h2>
+  <table>
+    <thead><tr><th>Method & Severity</th><th>POs</th><th>Value at Risk</th></tr></thead>
+    <tbody>
+      <tr><td>Z-Score Critical (>3.5 SD)</td><td>31</td><td class="crit">₹18.2Cr</td></tr>
+      <tr><td>Z-Score High (2.5–3.5 SD)</td><td>36</td><td class="high">₹15.1Cr</td></tr>
+      <tr><td>IQR Method</td><td>27</td><td class="med">₹10Cr</td></tr>
+      <tr><td><strong>Total Combined</strong></td><td><strong>94</strong></td><td class="crit"><strong>₹43.3Cr</strong></td></tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <thead><tr><th>Anomaly Type</th><th>Count</th></tr></thead>
+    <tbody>
+      <tr><td>Price Spike >40% above median</td><td class="crit">34</td></tr>
+      <tr><td>Quantity Mismatch</td><td class="high">26</td></tr>
+      <tr><td>Duplicate PO Detected</td><td class="med">19</td></tr>
+      <tr><td>Delivery >30 Days Late</td><td class="med">15</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Savings -->
+<div class="sec">
+  <h2>💰 Procurement Savings — Median Benchmarking</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Current Spend</th><th>Benchmark</th><th>Savings</th></tr></thead>
+    <tbody>
+      <tr><td>Raw Materials</td><td>₹82Cr</td><td>₹71Cr</td><td><span class="saving">₹11Cr</span></td></tr>
+      <tr><td>Packaging</td><td>₹45Cr</td><td>₹38Cr</td><td><span class="saving">₹7Cr</span></td></tr>
+      <tr><td>Logistics</td><td>₹38Cr</td><td>₹31Cr</td><td><span class="saving">₹5.75Cr</span></td></tr>
+      <tr><td>Chemicals</td><td>₹29Cr</td><td>₹25Cr</td><td><span class="saving">₹4Cr</span></td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>₹194Cr</strong></td><td><strong>₹165Cr</strong></td><td><span class="saving"><strong>₹27.75Cr</strong></span></td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- Dead Stock -->
+<div class="sec">
+  <h2>📦 Inventory Intelligence — Dead Stock by Warehouse</h2>
+  <table>
+    <thead><tr><th>Warehouse</th><th>Location</th><th>Dead Stock</th><th>SKUs</th><th>Days Static</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td>WH-02</td><td>Delhi</td><td class="crit">₹31Cr</td><td>39</td><td>90+</td><td><span class="pill pill-c">LIQUIDATE</span></td></tr>
+      <tr><td>WH-01</td><td>Mumbai</td><td class="crit">₹28Cr</td><td>47</td><td>120+</td><td><span class="pill pill-c">LIQUIDATE</span></td></tr>
+      <tr><td>WH-04</td><td>Kolkata</td><td class="high">₹29Cr</td><td>33</td><td>60+</td><td><span class="pill pill-h">REVIEW</span></td></tr>
+      <tr><td>WH-03</td><td>Chennai</td><td class="high">₹24Cr</td><td>28</td><td>75+</td><td><span class="pill pill-h">REVIEW</span></td></tr>
+      <tr><td>WH-05</td><td>Hyderabad</td><td class="med">₹16.9Cr</td><td>21</td><td>45+</td><td><span class="pill pill-m">MONITOR</span></td></tr>
+      <tr><td>WH-06</td><td>Pune</td><td class="low">₹10Cr</td><td>12</td><td>30+</td><td><span class="pill pill-l">OK</span></td></tr>
+      <tr><td><strong>Total</strong></td><td>—</td><td class="crit"><strong>₹138.9Cr</strong></td><td><strong>180</strong></td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<footer>
+  Built by <strong>Anke Jimrison</strong> — Data Analyst · Hyderabad, India<br><br>
+  <a href="https://github.com/anke-jimrison/supply-chain-intelligence">📁 Repository</a>
+  <a href="https://linkedin.com/in/anke-jimrison">💼 LinkedIn</a>
+  <a href="mailto:jimrisonanke@gmail.com">📧 Email</a>
+</footer>
+
+<script>
+// Risk Tier Donut
+new Chart(document.getElementById('riskChart'),{
+  type:'doughnut',
+  data:{labels:['Critical (≥70)','High (50-69)','Medium (30-49)','Low (<30)'],
+    datasets:[{data:[24,18,28,15],backgroundColor:['#f87171','#fb923c','#fbbf24','#34d399']}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}}}
+});
+
+// Savings Bar
+new Chart(document.getElementById('savingsChart'),{
+  type:'bar',
+  data:{labels:['Raw Materials','Packaging','Logistics','Chemicals'],
+    datasets:[
+      {label:'Current Spend',data:[82,45,38,29],backgroundColor:'#374151'},
+      {label:'Benchmark',data:[71,38,31,25],backgroundColor:'#1d4ed8'},
+      {label:'Savings',data:[11,7,5.75,4],backgroundColor:'#34d399'}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},
+    scales:{x:{ticks:{color:'#94a3b8',font:{size:10}},stacked:false},
+            y:{ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}}}}
+});
+
+// Anomaly Bar
+new Chart(document.getElementById('anomChart'),{
+  type:'bar',
+  data:{labels:['Price Spike','Qty Mismatch','Duplicate PO','Late Delivery'],
+    datasets:[{label:'Anomalies Detected',data:[34,26,19,15],
+      backgroundColor:['#f87171','#fb923c','#fbbf24','#60a5fa']}]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{labels:{color:'#94a3b8'}}},
+    scales:{x:{ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}},
+            y:{ticks:{color:'#94a3b8',font:{size:10}}}}}
+});
+
+// Warehouse Bar
+new Chart(document.getElementById('whChart'),{
+  type:'bar',
+  data:{labels:['WH-02 Delhi','WH-04 Kolkata','WH-01 Mumbai','WH-03 Chennai','WH-05 Hyd','WH-06 Pune'],
+    datasets:[{label:'Dead Stock (₹Cr)',data:[31,29,28,24,16.9,10],
+      backgroundColor:['#f87171','#fb923c','#f87171','#fb923c','#fbbf24','#34d399']}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#94a3b8'}}},
+    scales:{x:{ticks:{color:'#94a3b8',font:{size:9}}},
+            y:{ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}}}}
+});
+</script>
+</body>
+</html>
